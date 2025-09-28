@@ -1,0 +1,562 @@
+---
+title: "hiring_optimization_2"
+output:
+  word_document: default
+  html_document: default
+date: "2025-09-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Dataframes
+```{r}
+file.choose()
+```
+
+```{r}
+e_2020 <- read.csv("C:\\Users\\riley\\OneDrive\\Desktop\\DA Data\\DA_data_csv\\DA_data_2020_raw.csv")
+```
+
+```{r}
+e_2021 <- read.csv("C:\\Users\\riley\\OneDrive\\Desktop\\DA Data\\DA_data_csv\\DA_data_2021_raw.csv")
+```
+
+```{r}
+e_2022 <- read.csv("C:\\Users\\riley\\OneDrive\\Desktop\\DA Data\\DA_data_csv\\DA_data_2022_raw.csv")
+```
+
+```{r}
+e_2023 <- read.csv("C:\\Users\\riley\\OneDrive\\Desktop\\DA Data\\DA_data_csv\\DA_data_2023_raw.csv")
+```
+
+```{r}
+e_2024 <- read.csv("C:\\Users\\riley\\OneDrive\\Desktop\\DA Data\\DA_data_csv\\DA_data_2024_raw.csv")
+```
+
+#Packages
+```{r}
+install.packages("tidyverse")
+install.packages("dplyr")
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+#Cleaning
+
+##Remove headers
+```{r}
+remove_header <- function(e_2020) {
+  e_2020[-c(1:7), ]
+}
+
+e_2020 <- remove_header(e_2020)
+e_2021 <- remove_header(e_2021)
+e_2022 <- remove_header(e_2022)
+e_2023 <- remove_header(e_2023)
+e_2024 <- remove_header(e_2024)
+```
+
+##Rename columns
+```{r}
+rename_col <- function(e_2020) {
+  names(e_2020)[1] <- "occupation"
+  names(e_2020)[2] <- "total"
+  return(e_2020)
+}
+
+e_2020 <- rename_col(e_2020)
+e_2021 <- rename_col(e_2021)
+e_2022 <- rename_col(e_2022)
+e_2023 <- rename_col(e_2023)
+e_2024 <- rename_col(e_2024)
+```
+
+##Remove unnesessary columns
+```{r}
+remove_col <- function(e_2020) {
+  e_2020[,-(3:10)]
+}
+
+e_2020 <- remove_col(e_2020)
+e_2021 <- remove_col(e_2021)
+e_2022 <- remove_col(e_2022)
+e_2023 <- remove_col(e_2023)
+e_2024 <- remove_col(e_2024)
+```
+
+##Combine dataframes
+```{r}
+e_combined <- reduce(
+  list(e_2020, e_2021, e_2022, e_2023, e_2024),
+  dplyr::full_join,
+  by = "occupation"
+)
+```
+
+##Fix NA values
+```{r}
+e_combined[1, "total.y"] = 64744
+e_combined[1, "total.x.x"] = 68099
+e_combined[1, "total"] = 70744
+```
+
+##Rename total columns
+```{r}
+rename_total <- function(e_combined) {
+  names(e_combined)[2] <- "total_2020"
+  names(e_combined)[3] <- "total_2021"
+  names(e_combined)[4] <- "total_2022"
+  names(e_combined)[5] <- "total_2023"
+  names(e_combined)[6] <- "total_2024"
+  return(e_combined)
+}
+
+e_combined <- rename_total(e_combined)
+```
+
+```{r}
+view(e_combined)
+
+class(e_combined$total_2021)
+```
+
+##Fix total class
+```{r}
+e_combined$total_2020 <- as.numeric(e_combined$total_2020)
+e_combined$total_2021 <- as.numeric(e_combined$total_2021)
+e_combined$total_2022 <- as.numeric(e_combined$total_2022)
+e_combined$total_2023 <- as.numeric(e_combined$total_2023)
+e_combined$total_2024 <- as.numeric(e_combined$total_2024)
+```
+
+```{r}
+view(e_combined)
+```
+
+##Fix NA values
+```{r}
+e_combined[2, "total_2020"] = 27143
+e_combined[1587, "total_2020"] = 14168
+e_combined[87, "total_2020"] = 3169
+e_combined[112, "total_2020"] = 1627
+e_combined[158, "total_2020"] = 1183
+e_combined[2996, "total_2020"] = 18215
+
+e_combined[2, "total_2021"] = 27864
+e_combined[1587, "total_2021"] = 14369
+e_combined[87, "total_2021"] = 3235
+e_combined[112, "total_2021"] = 1640
+e_combined[158, "total_2021"] = 1085
+e_combined[2996, "total_2021"] = 19309
+
+e_combined[2, "total_2022"] = 29350
+e_combined[1587, "total_2022"] = 14316
+e_combined[87, "total_2022"] = 3464
+e_combined[112, "total_2022"] = 1840
+e_combined[158, "total_2022"] = 1141
+e_combined[2996, "total_2022"] = 20082
+
+e_combined[2, "total_2023"] = 30544
+e_combined[1587, "total_2023"] = 14325
+e_combined[87, "total_2023"] = 3602
+e_combined[112, "total_2023"] = 1870
+e_combined[158, "total_2023"] = 1189
+e_combined[2996, "total_2023"] = 19986
+
+e_combined[2, "total_2024"] = 30602
+e_combined[1587, "total_2024"] = 14090
+e_combined[87, "total_2024"] = 3552
+e_combined[112, "total_2024"] = 1877
+e_combined[158, "total_2024"] = 1146
+e_combined[2996, "total_2024"] = 19873
+```
+
+```{r}
+view(e_combined)
+```
+
+#OPV averages from 2020 to 2024 for common professions in a business
+
+##OPV from 2020 to 2021
+
+###"Management, business, and financial operations occupations" 20-21, OPV: 0.0262
+```{r}
+MBF_2020 <- e_combined %>% 
+  filter(occupation == "Management, business, and financial operations occupations") %>% 
+  select(total_2020)
+
+MBF_2021 <- e_combined %>% 
+  filter(occupation == "Management, business, and financial operations occupations") %>% 
+  select(total_2021)
+
+MBF_avg_1 <- (MBF_2021+MBF_2020)/2
+
+MBF_opv_1 <- (MBF_2021-MBF_2020)/MBF_avg_1
+
+print(MBF_opv_1)
+```
+
+###function to get OPV
+```{r}
+get_opv <- function(data, occupation, year1, year2) {
+  
+  col1 <- paste0("total_", year1)
+  col2 <- paste0("total_", year2)
+  
+  values <- data %>%
+    filter(occupation == !!occupation) %>%
+    select(all_of(c(col1, col2)))
+  
+  val1 <- pull(values, col1)
+  val2 <- pull(values, col2)
+  
+  avg <- (val1 + val2) / 2
+  opv <- (val2 - val1) / avg
+  
+  return(opv)
+}
+```
+
+```{r}
+MBF_opv_1 <- get_opv(e_combined, "Management, business, and financial operations occupations", 2020, 2021)
+```
+
+###"Sales and related occupations" 20-21, OPV: 0.0141
+```{r}
+SRO_opv_1 <- get_opv(e_combined, "Sales and related occupations", 2020, 2021)
+```
+
+###"Architecture and engineering occupations" 20-21, OPV: 0.0206
+```{r}
+AEO_opv_1 <- get_opv(e_combined, "Architecture and engineering occupations", 2020, 2021)
+```
+
+###"Life, physical, and social science occupations" 20-21, OPV: 0.0080
+```{r}
+LPS_opv_1 <- get_opv(e_combined, "Life, physical, and social science occupations", 2020, 2021)
+```
+
+###"Lawyers" 20-21, OPV: -0.0864
+```{r}
+LAW_opv_1 <- get_opv(e_combined, "Lawyers", 2020, 2021)
+```
+
+###"Production, transportation, and material moving occupations" 20-21, OPV: 0.0583
+```{r}
+PTM_opv_1 <- get_opv(e_combined, "Production, transportation, and material moving occupations", 2020, 2021)
+```
+
+##OPV from 2021 to 2022
+
+###"Management, business, and financial operations occupations" 21-22, OPV: 0.0519
+```{r}
+MBF_opv_2 <- get_opv(e_combined, "Management, business, and financial operations occupations", 2021, 2022)
+```
+
+###"Sales and related occupations" 21-22, OPV: -0.0037
+```{r}
+SRO_opv_2 <- get_opv(e_combined, "Sales and related occupations", 2021, 2022)
+```
+
+###"Architecture and engineering occupations" 21-22, OPV: 0.0684
+```{r}
+AEO_opv_2 <- get_opv(e_combined, "Architecture and engineering occupations", 2021, 2022)
+```
+
+###"Life, physical, and social science occupations" 21-22, OPV: 0.1149
+```{r}
+LPS_opv_2 <- get_opv(e_combined, "Life, physical, and social science occupations", 2021, 2022)
+```
+
+###"Lawyers" 21-22, OPV: 0.0503
+```{r}
+LAW_opv_2 <- get_opv(e_combined, "Lawyers", 2021, 2022)
+```
+
+###"Production, transportation, and material moving occupations" 21-22, OPV: 0.0392
+```{r}
+PTM_opv_2 <- get_opv(e_combined, "Production, transportation, and material moving occupations", 2021, 2022)
+```
+
+##OPV from 2022 to 2023
+
+###"Management, business, and financial operations occupations" 22-23, OPV: 0.0399
+```{r}
+MBF_opv_3 <- get_opv(e_combined, "Management, business, and financial operations occupations", 2022, 2023)
+```
+
+###"Sales and related occupations" 22-23, OPV: 0.0006
+```{r}
+SRO_opv_3 <- get_opv(e_combined, "Sales and related occupations", 2022, 2023)
+```
+
+###"Architecture and engineering occupations" 22-23, OPV: 0.0391
+```{r}
+AEO_opv_3 <- get_opv(e_combined, "Architecture and engineering occupations", 2022, 2023)
+```
+
+###"Life, physical, and social science occupations" 22-23, OPV: 0.0162
+```{r}
+LPS_opv_3 <- get_opv(e_combined, "Life, physical, and social science occupations", 2022, 2023)
+```
+
+###"Lawyers" 22-23, OPV: 0.0412
+```{r}
+LAW_opv_3 <- get_opv(e_combined, "Lawyers", 2022, 2023)
+```
+
+###"Production, transportation, and material moving occupations" 22-23, OPV: -0.0048
+```{r}
+PTM_opv_3 <- get_opv(e_combined, "Production, transportation, and material moving occupations", 2022, 2023)
+```
+
+##OPV from 2023 to 2024
+
+###"Management, business, and financial operations occupations" 23-24, OPV: 0.0019
+```{r}
+MBF_opv_4 <- get_opv(e_combined, "Management, business, and financial operations occupations", 2023, 2024)
+```
+
+###"Sales and related occupations" 23-24, OPV: -0.0165
+```{r}
+SRO_opv_4 <- get_opv(e_combined, "Sales and related occupations", 2023, 2024)
+```
+
+###"Architecture and engineering occupations" 23-24, OPV: -0.0140
+```{r}
+AEO_opv_4 <- get_opv(e_combined, "Architecture and engineering occupations", 2023, 2024)
+```
+
+###"Life, physical, and social science occupations" 23-24, OPV: 0.0037
+```{r}
+LPS_opv_4 <- get_opv(e_combined, "Life, physical, and social science occupations", 2023, 2024)
+```
+
+###"Lawyers" 23-24, OPV: -0.0368
+```{r}
+LAW_opv_4 <- get_opv(e_combined, "Lawyers", 2023, 2024)
+```
+
+###"Production, transportation, and material moving occupations" 23-24, OPV: -0.0057
+```{r}
+PTM_opv_4 <- get_opv(e_combined, "Production, transportation, and material moving occupations", 2023, 2024)
+```
+
+#OPV by profession: MBF: 0.02998193, SRO: -0.001380107, AEO: 0.02851566, LPS: 0.03570243, LAW: -0.007933602, PTM: 0.02177376
+```{r}
+MBF_opv_final <- (MBF_opv_1+MBF_opv_2+MBF_opv_3+MBF_opv_4)/4
+SRO_opv_final <- (SRO_opv_1+SRO_opv_2+SRO_opv_3+SRO_opv_4)/4
+AEO_opv_final <- (AEO_opv_1+AEO_opv_2+AEO_opv_3+AEO_opv_4)/4
+LPS_opv_final <- (LPS_opv_1+LPS_opv_2+LPS_opv_3+LPS_opv_4)/4
+LAW_opv_final <- (LAW_opv_1+LAW_opv_2+LAW_opv_3+LAW_opv_4)/4
+PTM_opv_final <- (PTM_opv_1+PTM_opv_2+PTM_opv_3+PTM_opv_4)/4
+```
+
+#Standardization
+```{r}
+opv_final_list <- c(0.02998193, -0.001380107, 0.02851566, 0.03570243, -0.007933602, 0.02177376)
+
+standardized_opv_list <- scale(opv_final_list)
+
+print(standardized_opv_list)
+```
+
+#Visualization
+
+##Packages
+```{r}
+install.packages("ggplot2")
+```
+
+```{r}
+library(ggplot2)
+```
+
+##Graph of OPV by profession
+
+###Putting OPV in dataframe format
+```{r}
+opv_df <- data.frame(
+  occupation = c("Management, business, and financial operations occupations", "Sales and related occupations", "Architecture and engineering occupations", "Life, physical, and social science occupations", "Lawyers", "Production, transportation, and material moving occupations"),
+  opv = c(standardized_opv_list)
+)
+```
+
+###Graphing
+```{r}
+ggplot(opv_df, aes(x = occupation, y = opv, fill = occupation)) +
+  geom_col() +
+  labs(
+    title = "OPV Values by Occupation",
+    x = "Occupation",
+    y = "OPV"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = -30, hjust = 0))
+```
+
+#Prediction
+
+##Change data from each profession into better format for linear regression
+```{r}
+MBF_opv_values <- c(MBF_opv_1, MBF_opv_2, MBF_opv_3, MBF_opv_4)
+MBF_df <- data.frame(
+  occupation = "Management, business, and financial operations occupations",
+  year = 2021:2024,
+  opv = MBF_opv_values
+)
+```
+
+```{r}
+view(MBF_df)
+```
+
+```{r}
+SRO_opv_values <- c(SRO_opv_1, SRO_opv_2, SRO_opv_3, SRO_opv_4)
+SRO_df <- data.frame(
+  occupation = "Sales and related occupations",
+  year = 2021:2024,
+  opv = SRO_opv_values
+)
+```
+
+```{r}
+AEO_opv_values <- c(AEO_opv_1, AEO_opv_2, AEO_opv_3, AEO_opv_4)
+AEO_df <- data.frame(
+  occupation = "Architecture and engineering occupations",
+  year = 2021:2024,
+  opv = AEO_opv_values
+)
+```
+
+```{r}
+LPS_opv_values <- c(LPS_opv_1, LPS_opv_2, LPS_opv_3, LPS_opv_4)
+LPS_df <- data.frame(
+  occupation = "Life, physical, and social science occupations",
+  year = 2021:2024,
+  opv = LPS_opv_values
+)
+```
+
+```{r}
+LAW_opv_values <- c(LAW_opv_1, LAW_opv_2, LAW_opv_3, LAW_opv_4)
+LAW_df <- data.frame(
+  occupation = "Lawyers",
+  year = 2021:2024,
+  opv = LAW_opv_values
+)
+```
+
+```{r}
+PTM_opv_values <- c(PTM_opv_1, PTM_opv_2, PTM_opv_3, PTM_opv_4)
+PTM_df <- data.frame(
+  occupation = "Production, transportation, and material moving occupations",
+  year = 2021:2024,
+  opv = PTM_opv_values
+)
+```
+
+##Create prediction model
+```{r}
+predict_opv_2025 <- function(df) {
+  model <- lm(opv ~ year, data = df)
+  prediction <- predict(model, newdata = data.frame(year = 2025))
+  return(prediction)
+}
+```
+
+###Apply model to each profession
+```{r}
+MBF_2025_pred <- predict_opv_2025(MBF_df)
+SRO_2025_pred <- predict_opv_2025(SRO_df)
+AEO_2025_pred <- predict_opv_2025(AEO_df)
+LPS_2025_pred <- predict_opv_2025(LPS_df)
+LAW_2025_pred <- predict_opv_2025(LAW_df)
+PTM_2025_pred <- predict_opv_2025(PTM_df)
+```
+
+###Standardize predictions
+```{r}
+predicted_opvs <- c(MBF_2025_pred, SRO_2025_pred, AEO_2025_pred, LPS_2025_pred, LAW_2025_pred, PTM_2025_pred)
+
+z_scores_2025 <- scale(predicted_opvs)
+
+print(z_scores_2025)
+
+view(z_scores_2025)
+```
+
+###Predicted OPV scores for 2025: MBF: 0.53, SRO: -0.84, AEO: -0.05, LPS: 0.49, LAW: 1.31, PTM: -1.44
+
+#Dataframes for in-depth visualization
+```{r}
+MBF_2020_2025_opv <- c(MBF_opv_1, MBF_opv_2, MBF_opv_3, MBF_opv_4, MBF_2025_pred)
+
+MBF_2020_2025_df <- data.frame(
+  year = 2021:2025,
+  opv = MBF_2020_2025_opv
+)
+```
+
+```{r}
+SRO_2020_2025_opv <- c(SRO_opv_1, SRO_opv_2, SRO_opv_3, SRO_opv_4, SRO_2025_pred)
+
+SRO_2020_2025_df <- data.frame(
+  year = 2021:2025,
+  opv = SRO_2020_2025_opv
+)
+```
+
+```{r}
+AEO_2020_2025_opv <- c(AEO_opv_1, AEO_opv_2, AEO_opv_3, AEO_opv_4, AEO_2025_pred)
+
+AEO_2020_2025_df <- data.frame(
+  year = 2021:2025,
+  opv = AEO_2020_2025_opv
+)
+```
+
+```{r}
+LPS_2020_2025_opv <- c(LPS_opv_1, LPS_opv_2, LPS_opv_3, LPS_opv_4, LPS_2025_pred)
+
+LPS_2020_2025_df <- data.frame(
+  year = 2021:2025,
+  opv = LPS_2020_2025_opv
+)
+```
+
+```{r}
+LAW_2020_2025_opv <- c(LAW_opv_1, LAW_opv_2, LAW_opv_3, LAW_opv_4, LAW_2025_pred)
+
+LAW_2020_2025_df <- data.frame(
+  year = 2021:2025,
+  opv = LAW_2020_2025_opv
+)
+```
+
+```{r}
+PTM_2020_2025_opv <- c(PTM_opv_1, PTM_opv_2, PTM_opv_3, PTM_opv_4, PTM_2025_pred)
+
+PTM_2020_2025_df <- data.frame(
+  year = 2021:2025,
+  opv = PTM_2020_2025_opv
+)
+
+view(PTM_2020_2025_df)
+```
+
+##Export dataframes
+```{r}
+write.csv(MBF_2020_2025_df, "C:\\Users\\riley\\OneDrive\\Desktop\\MBF_2020_2025_df.csv", row.names = FALSE)
+write.csv(SRO_2020_2025_df, "C:\\Users\\riley\\OneDrive\\Desktop\\SRO_2020_2025_df.csv", row.names = FALSE)
+write.csv(AEO_2020_2025_df, "C:\\Users\\riley\\OneDrive\\Desktop\\AEO_2020_2025_df.csv", row.names = FALSE)
+write.csv(LPS_2020_2025_df, "C:\\Users\\riley\\OneDrive\\Desktop\\LPS_2020_2025_df.csv", row.names = FALSE)
+write.csv(LAW_2020_2025_df, "C:\\Users\\riley\\OneDrive\\Desktop\\LAW_2020_2025_df.csv", row.names = FALSE)
+write.csv(PTM_2020_2025_df, "C:\\Users\\riley\\OneDrive\\Desktop\\PTM_2020_2025_df.csv", row.names = FALSE)
+```
+
